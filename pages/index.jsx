@@ -1,4 +1,6 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+import { useEffect, useState } from 'react';
+import axios from 'axios'
 import appConfig from '../config.json'
 
 
@@ -38,7 +40,7 @@ function GlobalStyle() {
 
 
 function Title(props) {
-    const Tag = props.tag
+    const Tag = props.tag || 'h1'
     const text = props.children
 
     return (
@@ -57,11 +59,17 @@ function Title(props) {
 
 
 export default function PaginaInicial() {
-    const username = 'peas';
+    const [username, setUsername] = useState('peas') 
+
+
+    function handleUsername(event) {
+        setUsername(event.target.value)
+    }
 
     return (
         <>
             <GlobalStyle />
+            
             <Box
                 styleSheet={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -88,6 +96,9 @@ export default function PaginaInicial() {
                     {/* Formulário */}
                     <Box
                         as="form"
+                        onSubmit={function(event) {
+                            event.preventDefault();
+                        }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -99,6 +110,8 @@ export default function PaginaInicial() {
                         </Text>
 
                         <TextField
+                            value={ username }
+                            onChange={ handleUsername }
                             fullWidth
                             textFieldColors={{
                                 neutral: {
