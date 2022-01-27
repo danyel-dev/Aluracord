@@ -1,21 +1,44 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js';
+
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMwMjYzMywiZXhwIjoxOTU4ODc4NjMzfQ.o_R8E2MCmHb5rTmQUGA4qmQ1-_Jh_TcMgCd7KnM2_mU'
+const SUPABASE_URL = "https://juzrkxaqkiswpwxvelfv.supabase.co"
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
 export default function ChatPage() {
     const [listaMensagens, setListaMensagens] = useState([])
     const [mensagem, setMensagem] = useState("")
 
+    useEffect(() => {
+        supabaseClient
+        .from('mensagens')
+        .select('*')
+        .order('id', { ascending: false })
+        .then(({ data }) => {
+            setListaMensagens(data)
+        })
+    }, []) 
+
     function handleAddingMessages(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
+            
             const MessageObject = {
-                id: listaMensagens.length,
-                de: 'Carlos Daniel',
+                de: 'danyel-dev',
                 texto: mensagem
             }
-            setListaMensagens([MessageObject, ...listaMensagens])
+
+            supabaseClient
+                .from('mensagens')
+                .insert([MessageObject])
+                .then(({ data }) => {
+                    setListaMensagens([data[0], ...listaMensagens])
+                })
+
             setMensagem("")
         }
     }
@@ -112,7 +135,6 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log(props)
     return (
         <Box
             tag="ul"
@@ -152,7 +174,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/vanessametonini.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
@@ -165,7 +187,7 @@ function MessageList(props) {
                                 }}
                                 tag="span"
                             >
-                                {(new Date().toLocaleDateString())}
+                                {mensagem.created_at}
                             </Text>
                         </Box>
                         {mensagem.texto}
