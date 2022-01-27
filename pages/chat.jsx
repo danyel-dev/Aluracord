@@ -4,8 +4,21 @@ import appConfig from '../config.json';
 
 
 export default function ChatPage() {
-    const [mensagens, setMensagens] = useState([])
+    const [listaMensagens, setListaMensagens] = useState([])
+    const [mensagem, setMensagem] = useState("")
 
+    function handleAddingMessages(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const MessageObject = {
+                id: listaMensagens.length,
+                de: 'Carlos Daniel',
+                texto: mensagem
+            }
+            setListaMensagens([...listaMensagens, MessageObject])
+            setMensagem("")
+        }
+    }
 
     return (
         <Box
@@ -45,8 +58,8 @@ export default function ChatPage() {
                     }}
                 >
 
-                    {/* <MessageList mensagens={[]} /> */}
-
+                    <MessageList mensagens={listaMensagens} />
+                    
                     <Box
                         as="form"
                         styleSheet={{
@@ -55,9 +68,11 @@ export default function ChatPage() {
                         }}
                     >
                         <TextField
-                            onChange={() => {
-                                console.log('oi')
+                            value={mensagem}
+                            onChange={(event) => {
+                                setMensagem(event.target.value)
                             }}
+                            onKeyPress={handleAddingMessages}
                             placeholder="Insira sua mensagem aqui..."
                             type="textarea"
                             styleSheet={{
@@ -97,7 +112,7 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log('MessageList', props);
+    console.log(props)
     return (
         <Box
             tag="ul"
@@ -139,7 +154,7 @@ function MessageList(props) {
                         src={`https://github.com/vanessametonini.png`}
                     />
                     <Text tag="strong">
-                        {mensagem.de}
+                        {/* {mensagem.de} */}
                     </Text>
                     <Text
                         styleSheet={{
@@ -152,7 +167,7 @@ function MessageList(props) {
                         {(new Date().toLocaleDateString())}
                     </Text>
                 </Box>
-                {mensagem.texto}
+                {/* {mensagem.texto} */}
             </Text>
         </Box>
     )
