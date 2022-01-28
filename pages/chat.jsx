@@ -11,6 +11,16 @@ const SUPABASE_URL = "https://juzrkxaqkiswpwxvelfv.supabase.co"
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
+function escutaMensagensEmTempoReal(addMessage) {
+    return supabaseClient
+        .from('mensagens')
+        .on('INSERT', (newMensagem) => {
+            addMessage(newMensagem.new)
+        })
+        .subscribe()
+}
+
+
 export default function ChatPage() {
     const roteamento = useRouter();
     const username = roteamento.query.username;
@@ -26,6 +36,15 @@ export default function ChatPage() {
         .then(({ data }) => {
             setListaMensagens(data)
         })
+
+        escutaMensagensEmTempoReal((novaMensagem) => {
+            setListaMensagens((valorDaListaAtual) => {
+                return [
+                    novaMensagem,
+                    ...valorDaListaAtual
+                ]
+            })
+        });
     }, []) 
 
     function handleAddingMessages(novaMensagem) {
@@ -38,7 +57,7 @@ export default function ChatPage() {
             .from('mensagens')
             .insert([MessageObject])
             .then(({ data }) => {
-                setListaMensagens([data[0], ...listaMensagens])
+                // setListaMensagens([data[0], ...listaMensagens])
             })
 
         setMensagem("")
