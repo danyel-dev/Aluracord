@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { createClient } from '@supabase/supabase-js';
-
+import ButtonSendSticker from '../src/components/ButtonSendSticker';
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMwMjYzMywiZXhwIjoxOTU4ODc4NjMzfQ.o_R8E2MCmHb5rTmQUGA4qmQ1-_Jh_TcMgCd7KnM2_mU'
 const SUPABASE_URL = "https://juzrkxaqkiswpwxvelfv.supabase.co"
@@ -28,24 +28,22 @@ export default function ChatPage() {
         })
     }, []) 
 
-    function handleAddingMessages(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            
-            const MessageObject = {
-                de: username,
-                texto: mensagem
-            }
-
-            supabaseClient
-                .from('mensagens')
-                .insert([MessageObject])
-                .then(({ data }) => {
-                    setListaMensagens([data[0], ...listaMensagens])
-                })
-
-            setMensagem("")
+    function handleAddingMessages(novaMensagem) {
+        const MessageObject = {
+            de: username,
+            texto: novaMensagem
         }
+
+        console.log(novaMensagem)
+
+        supabaseClient
+            .from('mensagens')
+            .insert([MessageObject])
+            .then(({ data }) => {
+                setListaMensagens([data[0], ...listaMensagens])
+            })
+
+        setMensagem("")
     }
 
     return (
@@ -100,7 +98,12 @@ export default function ChatPage() {
                             onChange={(event) => {
                                 setMensagem(event.target.value)
                             }}
-                            onKeyPress={handleAddingMessages}
+                            onKeyPress={(event) => {
+                                if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    handleAddingMessages(mensagem)
+                                }
+                            }}
                             placeholder="Insira sua mensagem aqui..."
                             type="textarea"
                             styleSheet={{
@@ -114,6 +117,7 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <ButtonSendSticker handleAddingMessages={handleAddingMessages} />
                     </Box>
                 </Box>
             </Box>
@@ -144,7 +148,7 @@ function MessageList(props) {
         <Box
             tag="ul"
             styleSheet={{
-                // overflow: 'scroll',
+                overflowY: 'scroll',
                 display: 'flex',
                 flexDirection: 'column-reverse',
                 flex: 1,
@@ -195,7 +199,16 @@ function MessageList(props) {
                                 {mensagem.created_at}
                             </Text>
                         </Box>
-                        {mensagem.texto}
+                        {mensagem.texto.startsWith(':sticker:')
+                            ? (
+                                <Image
+                                    src={mensagem.texto.replace(':sticker:', '')}
+                                />
+                            )
+                            : (
+                                mensagem.texto
+                            )
+                        }
                     </Text>
                 );
             })}
