@@ -34,8 +34,6 @@ export default function ChatPage() {
             texto: novaMensagem
         }
 
-        console.log(novaMensagem)
-
         supabaseClient
             .from('mensagens')
             .insert([MessageObject])
