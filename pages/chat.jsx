@@ -1,15 +1,20 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { createClient } from '@supabase/supabase-js';
 
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMwMjYzMywiZXhwIjoxOTU4ODc4NjMzfQ.o_R8E2MCmHb5rTmQUGA4qmQ1-_Jh_TcMgCd7KnM2_mU'
 const SUPABASE_URL = "https://juzrkxaqkiswpwxvelfv.supabase.co"
+
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
 export default function ChatPage() {
+    const roteamento = useRouter();
+    const username = roteamento.query.username;
+
     const [listaMensagens, setListaMensagens] = useState([])
     const [mensagem, setMensagem] = useState("")
 
@@ -28,7 +33,7 @@ export default function ChatPage() {
             event.preventDefault();
             
             const MessageObject = {
-                de: 'danyel-dev',
+                de: username,
                 texto: mensagem
             }
 
